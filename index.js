@@ -104,6 +104,26 @@ app.get('/shorts', async (req, res) => {
   }
 });
 
+app.get('/afbjs', async (req, res) => {
+  try {
+    const data = await getTableData('afbjs', 'id');
+
+    const rows = data.map(item => [
+      item.id,
+      item.bj_name,
+      item.profile_image,
+      item.url,
+    ]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('afbjs 조회 오류:', error.message);
+    res.status(500).json({ error: 'Failed to fetch afbjs from Supabase' });
+  }
+});
+
+
+
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT} 에서 서버 실행 중`);
 });
