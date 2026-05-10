@@ -122,6 +122,33 @@ app.get('/afbjs', async (req, res) => {
   }
 });
 
+app.get('/hm-signature', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('hm_signature')
+      .select('id, image_name, image_path, youtube_url')
+      .order('id', { ascending: true });
+
+    if (error) throw error;
+
+    const rows = data.map(item => [
+      item.id,
+      item.image_name,
+      item.image_path,
+      item.youtube_url,
+    ]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('hm_signature 조회 오류:', error.message);
+    res.status(500).json({
+      error: 'Failed to fetch hm_signature from Supabase',
+      message: error.message,
+    });
+  }
+});
+
+
 
 
 app.listen(PORT, () => {
