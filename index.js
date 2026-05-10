@@ -106,7 +106,7 @@ app.get('/shorts', async (req, res) => {
 
 app.get('/afbjs', async (req, res) => {
   try {
-    const data = await getTableData('afbjs', 'id');
+    const data = await getTableData('bjs', 'id');
 
     const rows = data.map(item => [
       item.id,
