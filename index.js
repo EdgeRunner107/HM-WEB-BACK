@@ -148,7 +148,60 @@ app.get('/hm-signature', async (req, res) => {
   }
 });
 
+app.get('/salary-settings', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('salary_settings')
+      .select('id, title, round_revenues, shares, penalties, updated_at')
+      .eq('id', 1)
+      .single();
 
+    if (error) throw error;
+
+    res.json(data);
+  } catch (error) {
+    console.error('salary_settings 조회 오류:', error.message);
+    res.status(500).json({
+      error: 'Failed to fetch salary_settings from Supabase',
+      message: error.message,
+    });
+  }
+});
+
+// 급여 설정 저장/수정
+app.put('/salary-settings', async (req, res) => {
+  try {
+    const {
+      round_revenues,
+      shares,
+      penalties,
+    } = req.body;
+
+    const { data, error } = await supabase
+      .from('salary_settings')
+      .update({
+        round_revenues: round_revenues || {},
+        shares: shares || {},
+        penalties: penalties || {},
+      })
+      .eq('id', 1)
+      .select('id, title, round_revenues, shares, penalties, updated_at')
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      message: 'salary_settings saved successfully',
+      data,
+    });
+  } catch (error) {
+    console.error('salary_settings 저장 오류:', error.message);
+    res.status(500).json({
+      error: 'Failed to save salary_settings to Supabase',
+      message: error.message,
+    });
+  }
+});
 
 
 app.listen(PORT, () => {
