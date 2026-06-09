@@ -152,19 +152,24 @@ app.get('/salary-settings', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('salary_settings')
-      .select('id, title, round_revenues, shares, penalties, updated_at')
+      .select('*')
       .eq('id', 1)
       .single();
 
     if (error) throw error;
 
-    res.json(data);
-  } catch (error) {
-    console.error('salary_settings 조회 오류:', error.message);
-    res.status(500).json({
-      error: 'Failed to fetch salary_settings from Supabase',
-      message: error.message,
+    res.json({
+      round_revenues: data.round_revenues || {},
+      shares: data.shares || {},
+      penalties: data.penalties || {},
+      special_contributions: data.special_contributions || {},
+      special_round_shares: data.special_round_shares || {},
+      job_battle_rate: data.job_battle_rate || '0.55',
+      total_contribution_rate: data.total_contribution_rate || '0.7',
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'salary settings load failed' });
   }
 });
 
@@ -175,31 +180,37 @@ app.put('/salary-settings', async (req, res) => {
       round_revenues,
       shares,
       penalties,
+      special_contributions,
+      special_round_shares,
+      job_battle_rate,
+      total_contribution_rate,
     } = req.body;
 
     const { data, error } = await supabase
       .from('salary_settings')
-      .update({
-        round_revenues: round_revenues || {},
-        shares: shares || {},
-        penalties: penalties || {},
-      })
-      .eq('id', 1)
-      .select('id, title, round_revenues, shares, penalties, updated_at')
+      .upsert(
+        {
+          id: 1,
+          round_revenues: round_revenues || {},
+          shares: shares || {},
+          penalties: penalties || {},
+          special_contributions: special_contributions || {},
+          special_round_shares: special_round_shares || {},
+          job_battle_rate: job_battle_rate || '0.55',
+          total_contribution_rate: total_contribution_rate || '0.7',
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'id' }
+      )
+      .select()
       .single();
 
     if (error) throw error;
 
-    res.json({
-      message: 'salary_settings saved successfully',
-      data,
-    });
+    res.json(data);
   } catch (error) {
-    console.error('salary_settings 저장 오류:', error.message);
-    res.status(500).json({
-      error: 'Failed to save salary_settings to Supabase',
-      message: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ error: 'salary settings save failed' });
   }
 });
 
