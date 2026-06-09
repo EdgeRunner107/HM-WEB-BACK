@@ -164,11 +164,12 @@ app.get('/salary-settings', async (req, res) => {
       penalties: data.penalties || {},
       special_contributions: data.special_contributions || {},
       special_round_shares: data.special_round_shares || {},
+      waiter_rates: data.waiter_rates || {},
       job_battle_rate: data.job_battle_rate || '0.55',
       total_contribution_rate: data.total_contribution_rate || '0.7',
     });
   } catch (error) {
-    console.error(error);
+    console.error('salary-settings GET error:', error);
     res.status(500).json({ error: 'salary settings load failed' });
   }
 });
@@ -182,6 +183,7 @@ app.put('/salary-settings', async (req, res) => {
       penalties,
       special_contributions,
       special_round_shares,
+      waiter_rates,
       job_battle_rate,
       total_contribution_rate,
     } = req.body;
@@ -196,6 +198,7 @@ app.put('/salary-settings', async (req, res) => {
           penalties: penalties || {},
           special_contributions: special_contributions || {},
           special_round_shares: special_round_shares || {},
+          waiter_rates: waiter_rates || {},
           job_battle_rate: job_battle_rate || '0.55',
           total_contribution_rate: total_contribution_rate || '0.7',
           updated_at: new Date().toISOString(),
@@ -209,7 +212,7 @@ app.put('/salary-settings', async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error(error);
+    console.error('salary-settings PUT error:', error);
     res.status(500).json({ error: 'salary settings save failed' });
   }
 });
