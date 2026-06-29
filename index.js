@@ -244,11 +244,12 @@ app.post('/sms', async (req, res) => {
 
     const { data, error } = await supabase
       .from('sms_logs')
-      .insert({
-        sender,
-        message,
-        raw: body,
-      })
+          .insert({
+            sender,
+            message,
+            raw: body,
+            is_done: false
+        })
       .select()
       .single();
 
