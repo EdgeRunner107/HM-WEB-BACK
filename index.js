@@ -217,6 +217,58 @@ app.put('/salary-settings', async (req, res) => {
   }
 });
 
+app.post('/sms', async (req, res) => {
+  try {
+    const body = req.body || {};
+
+    const sender =
+      body.sender ||
+      body.from ||
+      body.phone ||
+      body.number ||
+      '';
+
+    const message =
+      body.message ||
+      body.msg ||
+      body.text ||
+      body.content ||
+      '';
+
+    if (!message) {
+      return res.status(400).json({
+        ok: false,
+        error: 'message 값이 필요합니다.',
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('sms_logs')
+      .insert({
+        sender,
+        message,
+        raw: body,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      ok: true,
+      data,
+    });
+  } catch (error) {
+    console.error('SMS 저장 오류:', error.message);
+    res.status(500).json({
+      ok: false,
+      error: 'SMS save failed',
+      message: error.message,
+    });
+  }
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT} 에서 서버 실행 중`);
